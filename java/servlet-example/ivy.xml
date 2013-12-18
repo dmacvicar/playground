@@ -1,0 +1,11 @@
+<ivy-module version="2.0">
+    <info organisation="duncan" module="examples.servlets"/>
+    <configurations>
+        <conf name="sources"  description="Source jars"/>
+        <conf name="binaries" description="binary jars"/>
+    </configurations>
+    <dependencies>
+        <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.1.0.v20131115" conf="binaries->default"/>
+        <dependency org="javax.servlet" name="javax.servlet-api" rev="3.1-b05" conf="binaries->default"/>
+    </dependencies>
+</ivy-module>
