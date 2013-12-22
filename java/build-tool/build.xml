@@ -1,0 +1,84 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="build-tool" default="resolve">
+   <taskdef resource="org/apache/ivy/ant/antlib.xml"
+            uri="antlib:org.apache.ivy.ant" classpath="/usr/share/java/ivy.jar"/>
+
+  <property name="src.dir" location="${basedir}/src" />
+  <property name="build.dir" location="${basedir}/build" />
+
+  <path id="libjars">
+    <fileset dir="${basedir}/lib" includes="**/*.jar" />
+  </path>
+
+  <target name="resolve" description="retrieve dependencies with ivy">
+    <!--ivy:retrieve conf="sources" pattern="lib/[conf]/[artifact](-[classifier]).[ext]"/-->
+    <ivy:retrieve conf="binaries" pattern="lib/[conf]/[artifact](-[classifier]).[ext]"/>
+  </target>
+
+  <target name="clean" description="Remove build directories">
+    <!--delete dir="lib"/-->
+    <delete dir="${build.dir}" />
+  </target>
+
+  <target name="clean-all" depends="clean" description="clean ivy cache">
+    <ivy:cleancache />
+  </target>
+
+  <target name="compile" depends="clean">
+    <mkdir dir="${build.dir}/classes" />
+    <javac includeantruntime="false" srcdir="${src.dir}/main/java" destdir="${build.dir}/classes" debug="on" source="1.6">
+      <classpath>
+        <path refid="libjars"/>
+        <pathelement location="${build.dir}/classes"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <mkdir dir="build/jar"/>
+    <jar destfile="build/jar/build.jar" basedir="build/classes">
+      <manifest>
+        <attribute name="Main-Class" value="duncan.build.Main"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="run" depends="compile">
+      <java fork="true" classname="duncan.build.Main">
+         <classpath>
+           <pathelement location="${build.dir}/classes"/>
+           <path refid="libjars"/>
+         </classpath>
+       </java>
+  </target>
+
+  <target name="debug">
+      <nbjpdastart addressproperty="jpda.address" name="NameOfProject" transport="dt_socket">
+          <classpath>
+           <pathelement location="${build.dir}/classes"/>
+           <path refid="libjars"/>
+         </classpath>
+      </nbjpdastart>
+      <!-- TODO configure the main class for your project here: -->
+      <java classname="duncan.build.Main" fork="true">
+          <classpath>
+           <pathelement location="${build.dir}/classes"/>
+           <path refid="libjars"/>
+         </classpath>
+          <jvmarg value="-Xdebug"/>
+          <jvmarg value="-Xnoagent"/>
+          <jvmarg value="-Djava.compiler=none"/>
+          <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+      </java>
+  </target>
+
+  <target name="compile-tests" depends="compile">
+    <mkdir dir="${build.dir}/classes" />
+    <javac includeantruntime="false" srcdir="${src.dir}/test/java" destdir="${build.dir}/classes" debug="on" source="1.6">
+      <classpath>
+        <path refid="libjars"/>
+        <pathelement location="${build.dir}/classes"/>
+      </classpath>
+    </javac>
+  </target>
+
+</project>
