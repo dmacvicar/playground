@@ -1,13 +1,13 @@
 package duncan.build;
-
-import bsh.EvalError;
-import bsh.Interpreter;
-import bsh.This;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Stack;
 import java.nio.file.Paths;
+
+import org.luaj.vm2.*;
+import org.luaj.vm2.lib.jse.*;
+
 import org.apache.tools.ant.BuildLogger;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -17,11 +17,15 @@ import org.apache.tools.ant.listener.AnsiColorLogger;
 import org.apache.tools.ant.taskdefs.Delete;
 import org.apache.tools.ant.taskdefs.Javac;
 import org.apache.tools.ant.taskdefs.Mkdir;
+import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.ZeroArgFunction;
 
 public class Env implements ProjectBuilder {
      
     Project project = new Project();
-    Interpreter interpreter = new Interpreter();
+    private Globals globals = JsePlatform.standardGlobals();   
+    private LuaValue chunk;
+    
     //BuildLogger logger = new DefaultLogger();
     BuildLogger logger = new AnsiColorLogger();
     String root;
@@ -29,8 +33,12 @@ public class Env implements ProjectBuilder {
     public Env(String root) {
         project.init();
         this.root = root;
-        interpreter.getNameSpace().importCommands("duncan.build.commands");
-
+        
+        ProjectBuilder api = this;
+        //globals.set("env", CoerceJavaToLua.coerce(api));
+        globals.set("message", new message());
+        globals.set("java", new java());
+        
         logger.setOutputPrintStream(System.out);
         logger.setErrorPrintStream(System.out);
         logger.setMessageOutputLevel(Project.MSG_INFO);
@@ -40,13 +48,14 @@ public class Env implements ProjectBuilder {
     }
     
     public void run() throws Exception {
-        interpreter.set("env", this);
+        
         // default name as the directory
         project.setName(Paths.get(root).getFileName().toString());
 
-        Path buildFile = Paths.get(root, "build.js");
+        Path buildFile = Paths.get(root, "build.lua");
         if (Files.exists(buildFile)) {
-            interpreter.source(buildFile.toString());
+            chunk = globals.loadFile(buildFile.toString());
+            chunk.call();
         }
         
         Target cleanTarget = new Target();
@@ -110,5 +119,19 @@ public class Env implements ProjectBuilder {
 
     @Override
     public void java_library(String name) {
+    }
+    
+    protected static class message extends OneArgFunction {
+        public LuaValue call(LuaValue arg) {
+            System.out.println(arg.tojstring());
+            return LuaValue.NIL;
+        }
+    }
+
+    protected static class java extends ZeroArgFunction {
+        public LuaValue call() {
+            System.out.println("Java!");
+            return LuaValue.NIL;
+        }
     }
 }

@@ -6,7 +6,6 @@
     </configurations>
     <dependencies>
         <dependency org="org.apache.ant" name="ant" rev="1.9.2" conf="binaries->default"/>
-        <dependency org="org.beanshell" name="bsh-core" rev="2.0b4" conf="binaries->default" />
-        <dependency org="org.mozilla" name="rhino" rev="1.7R4" conf="binaries->default"/>
+        <dependency org="org.luaj" name="luaj-jse" rev="3.0-beta1"  conf="binaries->default"/>
     </dependencies>
 </ivy-module>
