@@ -7,5 +7,6 @@
     <dependencies>
         <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.1.0.v20131115" conf="binaries->default"/>
         <dependency org="javax.servlet" name="javax.servlet-api" rev="3.1-b05" conf="binaries->default"/>
+        <dependency org="opensymphony" name="sitemesh" rev="2.4.2"/>
     </dependencies>
 </ivy-module>
