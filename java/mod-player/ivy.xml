@@ -1,0 +1,15 @@
+<ivy-module version="2.0">
+    <info organisation="pistacho" module="player"/>
+    <configurations defaultconf="default,sources" defaultconfmapping="sources->sources;%->default">
+        <conf name="sources"  description="Source jars"/>
+        <conf name="default" description="binary jars"/>
+        <conf name="test" visibility="private"/>
+    </configurations>
+    <dependencies>
+        <!--<dependency org="com.github.jnr" name="jnr-ffi" rev="1.0.10"/>
+        <dependency org="com.github.jnr" name="jffi" rev="1.2.7"/>-->
+        <dependency org="net.java.dev.jna" name="jna-platform" rev="4.0.0" />
+        <dependency org="net.java.dev.jna" name="jna" rev="4.0.0" />
+        <dependency org="junit" name="junit" rev="4.11" />
+    </dependencies>
+</ivy-module>
