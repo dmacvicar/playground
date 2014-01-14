@@ -62,6 +62,7 @@ public class MODLoader extends LoaderBase {
             sample.setLoopStart(readWord(header));
             sample.setLoopEnd(readWord(header));
             mod.getSamples().add(sample);
+            System.out.println(sample.getName());
         }
 
         // now read the pattern order / play sequences
@@ -102,11 +103,11 @@ public class MODLoader extends LoaderBase {
                     int effectParam = entry[3] & 0xFF;
 
                     Sample sample = null;
-                    if (sampleNumber <= 31) {
-                        sample = mod.getSamples().get(sampleNumber);
+                    if (sampleNumber <= 31 && sampleNumber > 0) {
+                        sample = mod.getSamples().get(sampleNumber - 1);
                     }
-                    pat.setSample(chanIdx, rowIdx, sample);
-                    pat.setPeriodFrequency(chanIdx, rowIdx, periodFrequency);
+                    pat.setSample(rowIdx, chanIdx, sample);
+                    pat.setPeriodFrequency(rowIdx, chanIdx, periodFrequency);
                     // TODO add effects...
 
                 }
@@ -123,7 +124,7 @@ public class MODLoader extends LoaderBase {
 
         // load samples
         for (int i = 0; i < 31; i++) {
-            int sampleLen = data.read();
+            int sampleLen = mod.getSamples().get(i).getLength();
             byte[] sampleData = new byte[sampleLen];
             data.read(sampleData, 0, sampleLen);
             mod.getSamples().get(i).setData(sampleData);

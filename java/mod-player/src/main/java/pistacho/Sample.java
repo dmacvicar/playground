@@ -9,7 +9,7 @@ package pistacho;
 public class Sample {
 
     private String name = "";
-    private long length = 0;
+    private int length = 0;
     private int fineTune = 0;
     private int volume = 0;
     private long loopStart = 0;
@@ -41,14 +41,14 @@ public class Sample {
     /**
      * @return the length
      */
-    public long getLength() {
+    public int getLength() {
         return length;
     }
 
     /**
      * @param length the length to set
      */
-    public void setLength(long length) {
+    public void setLength(int length) {
         this.length = length;
     }
 
