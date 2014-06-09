@@ -1,70 +1,114 @@
 
 use std::iter::Iterator;
 use std::clone::Clone;
+use std::io::Buffer;
 
-pub enum Token {
+pub enum Event {
     StartTag,
     EndTag,
     Character,
     CData,
     Instruction,
     DocType,
-    Comment,
-    ErrorXmlInvalid,
-    Success,
-    ErrorBufferDry,
-    ErrorTokensFull,
+    Comment
 }
 
-// constants.rs
-// static LANGUAGE: &'static str = "Rust";
-// static THRESHOLD: int = 10;
-static TAG_MINSIZE: uint = 3;
-
-pub struct Parser<'a> {
-    buffer: &'a str,
-    /* Current offset into buffer - all XML data before this position has been successfully parsed */
-    bufferpos: uint,
-    /* Number of tokens filled with valid data by the parser */
-    ntokens: uint,
-    /* Used internally - keeps track of number of unclosed XML elements to detect start and end of document */
-    taglevel: uint,
+enum State {
+  State_Start,
+  State_StartTag
 }
 
-impl<'a> Parser<'a> {
+struct Error {
+    line: uint,
+    col: uint,
+    msg: ~str
+}
 
-    pub fn new(buffer: &'a str) -> Parser<'a> {
-        Parser {buffer: buffer, bufferpos: 0, ntokens: 0, taglevel: 0}
-    }
+pub struct Parser<T> {
+  priv ch: char,
+  priv reader: ~T,
+  priv line: uint,
+  priv col: uint,
+}
 
-    fn root_found(&'a self) -> bool {
-        self.taglevel > 0
-    }
+impl<T: Iterator<char>> Parser<T> {
 
-    fn root_parsed(&'a self) -> bool {
-        self.taglevel == 0
-    }
-
-    fn parse() -> Token {
-        ErrorBufferDry
+    fn new() -> Parser<T> {
+        let parser = Parser {
+            ch: -1,
+            line: 0,
+            col: 0,
+            reader: ~T,
+        }
+        parser.bump();
+        parser
     }
 }
 
-impl<'a> Clone for Parser<'a> {
-  fn clone(&self) -> Parser<'a> {
-      Parser { buffer: self.buffer, bufferpos: self.bufferpos, ntokens: self.ntokens, taglevel: self.taglevel }
-  }
+impl Parser<Buffer> {
+
+    fn read_char(&mut self) -> IoResult<char> {
+        let r = reader.read_char();
+        match r {
+            Ok(ch) => {
+                self.ch = ch;
+                match ch {
+                    '\n' => {
+                        self.line++;
+                        self.col = 0;
+                    }
+                    _ => self.col++;
+                }
+            }
+            _ =>
+        }
+        r
+    }
+
+    fn parse_whitespace(&mut self) {
+        let mut iter = self.reader.chars
+    }
+
+
+    fn parse(&mut self) {
+        let mut iter = self.reader.chars().peekable();
+
+        iter.by_ref().take_while(|ch| ch.is_whitespace());
+
+        let next = iter.peek();
+        match next {
+            Some(ch) => println!(ch)
+            None => println!("EOF")
+ 
+        }
+
+    
+    }
+
 }
 
-impl<'a> Iterator<Token> for Parser<'a> {
+//impl<'a> Clone for Parser<'a> {
+//  fn clone(&self) -> Parser<'a> {
+//      Parser { buffer: self.buffer, bufferpos: self.bufferpos, ntokens: self.ntokens, taglevel: self.taglevel }
+//  }
+//}
+
+impl Iterator<Token> for Parser {
 
   fn next(&mut self) -> Option<Token> {
 
-      let mut temp = self.clone();
+      while !self.eof() {
+            self.parse_whitespace();
+            debug!("line:%u, col:%u", self.line, self.col);
 
-      while !self.root_found() {
-          let start = self.buffer.slice_from(self.bufferpos);
-          let lt = self.buffer.trim_left();
+            match self.ch {
+                '<'
+            }
+      
+      while !temp.root_found() {
+          let start = temp.buffer.slice_from(temp.bufferpos);
+          let lt = temp.buffer.trim_left();
+
           
       }
 
