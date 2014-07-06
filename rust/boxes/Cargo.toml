@@ -1,0 +1,10 @@
+
+[package]
+
+name = "boxes"
+version = "0.1.0"
+authors = [ "dmacvicar@gmail.com" ]
+
+[[bin]]
+
+name = "boxes"
