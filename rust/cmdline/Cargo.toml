@@ -1,0 +1,8 @@
+
+[package]
+name = "cmdline"
+version = "0.1.0"
+authors = [ "dmacvicar@gmail.com" ]
+
+[[bin]]
+name = "cmdline"
