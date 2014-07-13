@@ -1,0 +1,13 @@
+[package]
+name = "vmit"
+version = "0.1.0"
+authors = [ "dmacvicar@gmail.com" ]
+
+[[bin]]
+name = "vmit"
+path = "src/bin/vmit.rs"
+
+[[lib]]
+name = "vmit"
+path = "src/lib.rs"
+
