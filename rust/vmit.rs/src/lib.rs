@@ -1,8 +1,11 @@
 #![crate_type = "lib"]
-#![crate_id = "vmit#0.1"]
+#![crate_name = "vmit"]
+#![feature(globs)]
 
 use std::os::getcwd;
 use std::owned::Box;
+
+pub mod virt;
 
 pub mod cli;
 
