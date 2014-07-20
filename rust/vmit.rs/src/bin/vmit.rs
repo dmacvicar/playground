@@ -11,6 +11,7 @@ use std::io::Writer;
 
 use vmit::Workspace;
 use vmit::cli;
+use vmit::virt;
 
 fn do_work(inp: &str, out: Option<String>) {
     println!("{}", inp);
@@ -18,6 +19,9 @@ fn do_work(inp: &str, out: Option<String>) {
         Some(x) => println!("{}", x),
         None => println!("No Output"),
     }
+
+    let mut conn = virt::Connection::open("qemu://system").ok().unwrap();
+    assert_eq!("hello", conn.get_sys_info().as_slice());
 }
 
 fn print_usage(program: &str, _opts: &[OptGroup]) {

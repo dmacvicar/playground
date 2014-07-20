@@ -1,9 +1,12 @@
+extern crate std;
 extern crate log;
 extern crate debug;
-mod ffi;
-mod types;
-use ffi::*;
-
+use std::c_str::CString;
+use super::ffi::*;
+use super::Result;
+use std::ptr::{mut_null};
+use std::string::String;
+use std::path::BytesContainer;
 
 pub struct Connection {
     ptr: virConnectPtr,
@@ -15,22 +18,35 @@ impl Connection {
         Connection{ptr: ptr}
     }
 
-    fn open(name: &str) -> VirResult<Connection> {
-        unsafe {
-            let r = name.with_c_string(|_name| {
-                match virConnectOpen(_name) {
-                    ptr::mut_null => Err("shit!"),
-                    p => Ok(Connection::from_ptr(p))
+    pub fn open(name: &str) -> Result<Connection> {
+            let r = name.with_c_str(|_name| {
+                let p = unsafe { virConnectOpen(_name) };
+                if p.is_null() {
+                    Err("shit!")
+                }
+                else {
+                    Ok(Connection::from_ptr(p))
                 }
             });
             return r;
-        };
     }
+
+
+    pub fn get_sys_info(&mut self) -> String {
+        let v =
+        unsafe {
+            CString::new(
+                virConnectGetSysinfo(self.ptr, 0), true)
+            .container_into_owned_bytes()
+        };
+        String::from_utf8(v).unwrap_or(String::new())
+    }
+
 }
 
 impl Drop for Connection {
     fn drop(&mut self) {
-        println!("`Connection.drop()`: ptr={:?}", self.ptr);
+        //println!("`Connection.drop()`: ptr={:?}", self.ptr);
         unsafe {
             virConnectClose(self.ptr);
         }
@@ -44,7 +60,7 @@ mod test {
 
     #[test]
     fn test_conn() {
-        let conn = Connection::open("qemu://system");
-        assert_eq!("hello", "hell");
+        let mut conn = Connection::open("qemu://system").ok().unwrap();
+        assert_eq!("hello", conn.get_sys_info().as_slice());
     }
 }
