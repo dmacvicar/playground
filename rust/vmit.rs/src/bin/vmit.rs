@@ -19,9 +19,6 @@ fn do_work(inp: &str, out: Option<String>) {
         Some(x) => println!("{}", x),
         None => println!("No Output"),
     }
-
-    let mut conn = virt::Connection::open("qemu://system").ok().unwrap();
-    assert_eq!("hello", conn.get_sys_info().as_slice());
 }
 
 fn print_usage(program: &str, _opts: &[OptGroup]) {
@@ -31,6 +28,10 @@ fn print_usage(program: &str, _opts: &[OptGroup]) {
 }
 
 fn main() {
+
+    let mut conn = virt::Connection::open("qemu+unix:///system").ok().unwrap();
+    println!("{}", conn.get_sys_info());
+
 
     cli::say_error("vmit starting");
 
