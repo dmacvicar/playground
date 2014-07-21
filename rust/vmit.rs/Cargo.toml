@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = [ "dmacvicar@gmail.com" ]
 
 [[bin]]
-name = "vmit"
+name = "vmitbin"
 path = "src/bin/vmit.rs"
 
 [[lib]]

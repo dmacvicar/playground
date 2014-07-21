@@ -60,7 +60,7 @@ mod test {
 
     #[test]
     fn test_conn() {
-        let mut conn = Connection::open("qemu://system").ok().unwrap();
-        assert_eq!("hello", conn.get_sys_info().as_slice());
+        let mut conn = Connection::open("qemu+unix:///system").ok().unwrap();
+        assert!(conn.get_sys_info().as_slice().ends_with("</sysinfo>\n"));
     }
 }

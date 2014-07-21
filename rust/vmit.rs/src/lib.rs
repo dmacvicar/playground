@@ -41,15 +41,13 @@ mod test {
         match TempDir::new("vmit") {
             Some(tmpdir) => {
                 println!("{}", tmpdir.path().display());
-                let ws = Workspace::new(tmpdir.path());
-
+                let ws = Workspace::new(tmpdir.path()); 
 
             }
             None => {
-              println!("ups!");
+              fail!("ups!")
             }
         }
-        assert_eq!("hello", "hell");
     }
 }
 
