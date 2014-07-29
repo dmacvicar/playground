@@ -1,0 +1,17 @@
+[package]
+
+name = "tui"
+version = "0.1.0"
+authors = [ "dmacvicar@gmail.com" ]
+
+[dependencies.rustbox]
+git = "https://github.com/gchp/rustbox.git"
+
+[[lib]]
+name = "tui"
+path = "src/lib.rs"
+
+[[bin]]
+name = "example1"
+path = "src/examples/example1.rs"
+
