@@ -1,0 +1,49 @@
+import requests
+import json
+from ws4py.client.threadedclient import WebSocketClient
+
+data = {'eauth': 'pam', 'username': 'test','password': 'test'}
+headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+print(json.dumps(data))
+r = requests.post('http://localhost:8001/login', data=json.dumps(data), headers=headers)
+data = r.json()
+print(data.__class__)
+token = data['return'][0]['token']
+
+if r.status_code == 200:
+    headers['X-Auth-Token'] = token
+else:
+    print("failed auth")
+    exit(1)
+
+r = requests.get('http://localhost:8001/minions', headers=headers)
+print r.status_code
+print r.json()
+
+class DummyClient(WebSocketClient):
+    def opened(self):
+        def data_provider():
+            for i in range(1, 200, 25):
+                yield "#" * i
+
+        self.send(data_provider())
+
+        for i in range(0, 200, 25):
+            print i
+            self.send("*" * i)
+
+    def closed(self, code, reason=None):
+        print "Closed down", code, reason
+
+    def received_message(self, m):
+        print m
+        if len(m) == 175:
+            self.close(reason='Bye bye')
+
+#if __name__ == '__main__':
+#    try:
+#        ws = DummyClient('ws://localhost:9000/', protocols=['http-only', 'chat'])
+#        ws.connect()
+#        ws.run_forever()
+#    except KeyboardInterrupt:
+#        ws.close()
