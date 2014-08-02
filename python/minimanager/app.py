@@ -4,10 +4,12 @@ import requests
 import json
 
 # create our little application :)
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 app.config.from_object(__name__)
 
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+SALT_API = 'http://localhost:8002'
 
 @app.route('/')
 def index():
@@ -19,11 +21,31 @@ def index():
     headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
     headers['X-Auth-Token'] = session['salt-token']
 
-    r = requests.get('http://localhost:8001/minions', headers=headers)
+    r = requests.get(SALT_API + '/minions', headers=headers)
     print r.status_code
     print r.text
 
-    return render_template('index.html', minions=r.json()['return'][0])
+    return app.send_static_file('index.html')
+
+@app.route('/minions')
+def minions():
+    if 'salt-token' in session:
+        print('Token is %s' % session['salt-token'])
+    else:
+        return redirect(url_for('login'))
+    headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+    headers['X-Auth-Token'] = session['salt-token']
+
+    r = requests.get(SALT_API + '/minions', headers=headers)
+    print r.status_code
+
+    minionmap = r.json()['return'][0]
+    print(json.dumps(minionmap))
+    # transform { minionid: {prop1: 'val1', ..}, ...} into
+    # [{id: 'minionid', prop1: 'val1', ...}, ...]
+    minions = [dict(v, id=k) for k,v in minionmap.items()]
+    return json.dumps(minions)
+
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -33,7 +55,7 @@ def login():
         data = {'eauth': 'pam', 'username': username,'password': password}
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         print(json.dumps(data))
-        r = requests.post('http://localhost:8001/login', data=json.dumps(data), headers=headers)
+        r = requests.post(SALT_API + '/login', data=json.dumps(data), headers=headers)
         if r.status_code == 200:
             flash("Logged in successfully.")
             print(r.text)
