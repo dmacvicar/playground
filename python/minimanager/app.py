@@ -9,7 +9,7 @@ app.config.from_object(__name__)
 
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
-SALT_API = 'http://localhost:8002'
+SALT_API = 'http://localhost:8001'
 
 @app.route('/')
 def index():
@@ -25,7 +25,7 @@ def index():
     print r.status_code
     print r.text
 
-    return app.send_static_file('index.html')
+    return render_template('index.html')
 
 @app.route('/minions')
 def minions():

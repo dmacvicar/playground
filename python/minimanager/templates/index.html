@@ -17,21 +17,7 @@
 
 <p>The following systems are known:</p>
 
-{% if minions %}
-  <table class="table table-stripped">
-    <tr>
-      <th>System</th>
-      <th>OS</th>
-      <th>Kernel</th>
-    </tr>
-    {% for minion, data in minions.iteritems() %}
-    <tr>
-      <td><a href="/minions/{{ minion }}">{{ minion }}</a></td>
-      <td>{{ data['osfullname'] }}</td>
-      <td>{{ data['kernelrelease'] }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-{% endif %}
+<div id="minions-table">
+</div>
 
 {% endblock %}
