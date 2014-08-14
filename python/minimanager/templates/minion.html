@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block customhead %}
+<script type="text/jsx" src="{{url_for('static', filename='js/minion.js')}}"></script>
+<script type="text/jsx" src="{{url_for('static', filename='js/Chart.min.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+
+<span id="now"></span>
+
+<div id="minion-details" data-minion-id="{{id}}">
+</div>
+
+{% endblock %}
