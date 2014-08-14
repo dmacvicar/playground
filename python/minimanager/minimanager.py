@@ -61,7 +61,7 @@ def logout():
 def ajax_minions(id=None):
     client = APIClient()
     app.logger.info("auth: %s" % _auth_token())
-    ret = client.minion_sync(tgt=(id or '*'), fun='grains.items', token=_auth_token(), timeout=1000)
+    ret = client.runnerClient.cmd('cache.grains', [(id or '*')], {'token':_auth_token()})
     # transform { minionid: {prop1: 'val1', ..}, ...} into
     # [{id: 'minionid', prop1: 'val1', ...}, ...]
     minions = [dict(v, id=k) for k,v in ret.items()]
