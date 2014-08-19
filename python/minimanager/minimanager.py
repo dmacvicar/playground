@@ -4,7 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 import requests
 import json
 from salt.client.api import APIClient
-
+from salt.exceptions import EauthAuthenticationError
 # create our little application :)
 app = Flask(__name__, static_url_path='')
 app.secret_key = '\x9e\x16\x12(yY\x1c\xacN\xbe\xad\x08\x08\x8a\x19\x9cj\xf0\xe8\x9d\x99l\xd2k'
@@ -22,7 +22,11 @@ def login_required(f):
         if not 'salt-token' in session:
             return redirect(url_for('login', next=request.url))
         app.logger.info('Token is %s' % session['salt-token'])
-        return f(*args, **kwargs)
+        try:
+            return f(*args, **kwargs)
+        except EauthAuthenticationError as e:
+            app.logger.info(e)
+            return redirect(url_for('login', next=request.url))
     return decorated_function
 
 def _auth_token():
@@ -75,6 +79,55 @@ def ajax_minions(id=None):
         return json.dumps(minion)
 
     return abort(404)
+
+@app.route('/api/runner/<fun>', methods = ['POST', 'GET'])
+@login_required
+def ajax_api_runner(fun):
+    '''
+    I am not sure why I am using master_call, but
+    RunnerClient::cmd is async even if you pass mode
+    'sync' and I don't understand why.
+    Then, only master call is supposed to work with eauth
+    which also I don't know why.
+
+    So I ended using master call and emulating sync
+    by waiting the ret event
+    '''
+    client = APIClient()
+
+    if request.method == 'POST':
+        data = json.loads(request.data)
+    else:
+        data = dict()
+        #data['fun'] = request.args.get('fun')
+        data['fun'] = fun
+        data['kwarg'] = dict()
+        #data['tgt'] = request.args.get('tgt') or '*'
+        for key in request.args.keys():
+            data['kwarg'][key] = request.args.get(key)
+
+        #data['kwarg']['tgt'] = request.args.get('tgt') or '*'
+#        data['kwarg'] = dict()
+        #data['arg'] = list()
+
+    data['token'] = _auth_token()
+    app.logger.info(data)
+
+    ret = client.runnerClient.master_call(**data)
+    tag = ret['tag']
+
+    while True:
+        app.logger.info('waiting for %s' % tag)
+        event = client.get_event(wait=0, tag=tag, full=True)
+        if event is None:
+            break
+
+        if event['tag'] == (tag + '/ret'):
+            return json.dumps(event['data']['return'])
+        else:
+            app.logger.info('ignored: %s' % event)
+
+    return abort(500)
 
 @app.route('/minions')
 @login_required
