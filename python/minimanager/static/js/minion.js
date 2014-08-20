@@ -93,6 +93,7 @@ var MinionPackages = React.createClass({
 $(function() {
 
   function showDetailsTab() {
+    $('#minion-details-tab').tab('show');
     React.renderComponent(
       <MinionDetails url={'/api/minions/' + $('#minion-content').data('minion-id')} />,
       document.getElementById('minion-content')
@@ -100,6 +101,7 @@ $(function() {
   }
 
   function showSoftwareTab() {
+    $('#minion-software-tab').tab('show');
     React.renderComponent(
       <MinionPackages minion={$('#minion-content').data('minion-id')} />,
       document.getElementById('minion-content')
