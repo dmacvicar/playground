@@ -29,14 +29,16 @@ The current design decisions have been made:
 * We could use websockets for everything however not all Salt data is
   real time, so we use old-AJAX for that.
 
-The current designs are planned:
+The current stuff I am not sure about:
 
 * Collect data and have the web app operate in a cache.
-  After spending some time on this problem I believe the simplest way
-  is to use the scheduler and returners. See 9.8 in
+  One could use the scheduler and returners. See 9.8 in
   http://docs.saltstack.com/en/latest/topics/jobs
+  The problem is that returners run on the minions.
 
   Also see https://speakerdeck.com/ipmb/monitoring-infrastructure-with-saltstack
+
+  
 
 ## Issues
 

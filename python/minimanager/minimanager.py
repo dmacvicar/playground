@@ -80,6 +80,18 @@ def ajax_minions(id=None):
 
     return abort(404)
 
+@app.route('/api/lowstate', methods = ['POST'])
+@login_required
+def ajax_api_lowstate():
+    client = APIClient()
+    app.logger.debug(request.form)
+    data = request.form.to_dict(flat=True)
+    data['token'] = _auth_token()
+    app.logger.info(data)
+
+    ret = client.run(data)
+    return json.dumps(ret)
+
 @app.route('/api/runner/<fun>', methods = ['POST', 'GET'])
 @login_required
 def ajax_api_runner(fun):

@@ -7,9 +7,15 @@
 
 {% block content %}
 
-<span id="now"></span>
+<ul class="nav nav-pills">
+  <li class="active"><a id="minion-details-tab" href="#">Details</a></li>
+  <li><a id="minion-software-tab" href="#">Software</a></li>
+  <li><a id="minion-config-tab" href="#">Configuration</a></li>
+</ul>
 
-<div id="minion-details" data-minion-id="{{id}}">
+<p></p>
+
+<div id="minion-content" data-minion-id="{{id}}">
 </div>
 
 {% endblock %}
