@@ -51,5 +51,12 @@ to implement websockets.
 
 On the client side, it uses jQuery and Facebook's React.
 
+### Roadmap
+
+* Cleanup some stuff in plain jQuery into React.js components
+  (eg, tab handling)
+* Learn about the Browserfy tools and the frontend zoo and make the
+  components testable.
+
 ## Templates
 
