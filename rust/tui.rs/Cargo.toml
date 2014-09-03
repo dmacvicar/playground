@@ -7,7 +7,7 @@ authors = [ "dmacvicar@gmail.com" ]
 [dependencies.rustbox]
 git = "https://github.com/gchp/rustbox.git"
 
-[[lib]]
+[lib]
 name = "tui"
 path = "src/lib.rs"
 
