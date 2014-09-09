@@ -12,6 +12,21 @@ trait Widget {
     fn get_min_size(&self) -> Size;
 }
 
+trait Painter<'a> {
+    fn new(&'a Widget) -> Self;
+}
+
+pub struct ConsolePainter<'a> {
+    widget: &'a Widget + 'a,
+}
+
+impl<'a> Painter<'a> for ConsolePainter<'a> {
+    fn new(widget: &'a Widget) -> ConsolePainter {
+        ConsolePainter{widget: widget}
+    }
+
+}
+
 pub struct Button {
     message: String
 }
