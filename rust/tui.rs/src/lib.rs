@@ -2,33 +2,33 @@ extern crate rustbox;
 use std::string::String;
 use std::char::from_u32;
 use std::vec::Vec;
+use std::mem;
 
 pub struct Size {
     width: uint,
     height: uint,
 }
 
+pub struct Pos {
+    x: uint,
+    y: uint,
+}
+
 trait Widget {
     fn get_min_size(&self) -> Size;
+    /// set by the container
+    fn set_size(&mut self, size: Size);
 }
 
-trait Painter<'a> {
-    fn new(&'a Widget) -> Self;
-}
+trait Container {
+    //fn get_children(&self) -> &[Widget];
 
-pub struct ConsolePainter<'a> {
-    widget: &'a Widget + 'a,
-}
-
-impl<'a> Painter<'a> for ConsolePainter<'a> {
-    fn new(widget: &'a Widget) -> ConsolePainter {
-        ConsolePainter{widget: widget}
-    }
-
+    fn add_widget<W: Widget + 'static>(&mut self, widget: W);
 }
 
 pub struct Button {
-    message: String
+    message: String,
+    size: Size,
 }
 
 impl Widget for Button {
@@ -36,9 +36,16 @@ impl Widget for Button {
         // text + border
         Size{width: self.message.len() + 2, height: 3}
     }
+
+    fn set_size(&mut self, size: Size) {
+        self.size = size;
+    }
 }
 
-pub struct HLayout;
+pub struct HLayout {
+    size: Size,
+    widgets: Vec<Box<Widget + 'static>>,
+}
 
 impl Widget for HLayout {
     fn get_min_size(&self) -> Size {
@@ -47,9 +54,30 @@ impl Widget for HLayout {
         // TODO
         Size{width: 0, height: 0}
     }
+
+    fn set_size(&mut self, size: Size) {
+        self.size = size;
+    }
+}
+
+impl Container for HLayout {
+    fn add_widget<W: Widget  + 'static>(&mut self, widget: W) {
+        let owned = box widget;
+        self.widgets.push(owned);
+    }
 }
 
 pub struct Screen;
+
+impl Widget for Screen {
+    fn get_min_size(&self) -> Size {
+        Size{width: rustbox::width(), height: rustbox::height()}
+    }
+
+    fn set_size(&mut self, size: Size) {
+        // no nop
+    }
+}
 
 impl Screen {
 
@@ -86,7 +114,7 @@ impl Screen {
 
 impl Drop for Screen {
   fn drop(&mut self) {
-      rustbox::shutdown();
+     rustbox::shutdown();
   }
 }
 
