@@ -16,7 +16,7 @@ pub struct Pos {
     y: uint,
 }
 
-trait Widget {
+pub trait Widget {
     fn get_min_size(&self) -> Size;
     /// set by the container
     fn set_size(&mut self, size: Size);
@@ -24,7 +24,7 @@ trait Widget {
     fn draw(&mut self, pos: Pos, size: Size);
 }
 
-trait Container {
+pub trait Container {
     fn add_widget<W: Widget + 'static>(&mut self, widget: W);
 }
 
@@ -99,8 +99,8 @@ impl<'a> Screen<'a> {
         Screen {widget: None}
     }
 
-    pub fn set_widget<W: Widget>(&mut self, widget: W) {
-        let owned = box widget;
+    pub fn set_widget<W: Widget + 'a>(&mut self, widget: W) {
+        let owned = (box widget) as Box<Widget>;
         self.widget = Some(owned);
     }
 
