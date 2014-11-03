@@ -1,4 +1,6 @@
+#![feature(unsafe_destructor)]
 extern crate rustbox;
+extern crate core;
 use std::string::String;
 use std::char::from_u32;
 use std::vec::Vec;
@@ -18,11 +20,11 @@ trait Widget {
     fn get_min_size(&self) -> Size;
     /// set by the container
     fn set_size(&mut self, size: Size);
+
+    fn draw(&mut self, pos: Pos, size: Size);
 }
 
 trait Container {
-    //fn get_children(&self) -> &[Widget];
-
     fn add_widget<W: Widget + 'static>(&mut self, widget: W);
 }
 
@@ -39,6 +41,10 @@ impl Widget for Button {
 
     fn set_size(&mut self, size: Size) {
         self.size = size;
+    }
+
+    fn draw(&mut self, pos: Pos, size: Size) {
+        println!("draw button");
     }
 }
 
@@ -58,6 +64,11 @@ impl Widget for HLayout {
     fn set_size(&mut self, size: Size) {
         self.size = size;
     }
+
+    fn draw(&mut self, pos: Pos, size: Size) {
+        println!("draw hlayout");
+    }
+
 }
 
 impl Container for HLayout {
@@ -67,21 +78,13 @@ impl Container for HLayout {
     }
 }
 
-pub struct Screen;
-
-impl Widget for Screen {
-    fn get_min_size(&self) -> Size {
-        Size{width: rustbox::width(), height: rustbox::height()}
-    }
-
-    fn set_size(&mut self, size: Size) {
-        // no nop
-    }
+pub struct Screen<'a> {
+    widget: Option<Box<Widget + 'a>>
 }
 
-impl Screen {
+impl<'a> Screen<'a> {
 
-    pub fn init() {
+    pub fn new() -> Screen<'a> {
         rustbox::init();
         rustbox::clear();
 
@@ -93,7 +96,13 @@ impl Screen {
                                      rustbox::convert_color(rustbox::Blue));
             }
         }
+        Screen {widget: Some(box w)}
     }
+
+    //pub fn set_widget<W: Widget>(&mut self, widget: W) {
+    //    let owned = box widget;
+    //    self.widget = Some(owned);
+    //}
 
     pub fn wait() {
         rustbox::present();
@@ -109,11 +118,29 @@ impl Screen {
             }
         }
     }
-
 }
 
-impl Drop for Screen {
-  fn drop(&mut self) {
+impl<'a> Widget for Screen<'a> {
+    fn get_min_size(&self) -> Size {
+        Size{width: rustbox::width(), height: rustbox::height()}
+    }
+
+    fn set_size(&mut self, size: Size) {
+        // no nop
+    }
+
+    fn draw(&mut self, pos: Pos, size: Size) {
+        println!("draw screen");
+        match self.widget {
+            Some(w) => println!("main widget"),
+            None => println!("no op")
+        }
+    }
+}
+
+#[unsafe_destructor]
+impl<'a> Drop for Screen<'a> {
+    fn drop(&mut self) {
      rustbox::shutdown();
   }
 }
