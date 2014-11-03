@@ -2,6 +2,6 @@
 extern crate tui;
 
 fn main() {
-    tui::Screen::init();
+    let screen = tui::Screen::new();
     tui::Screen::wait();
 }

@@ -96,7 +96,7 @@ impl<'a> Screen<'a> {
                                      rustbox::convert_color(rustbox::Blue));
             }
         }
-        Screen {widget: Some(box w)}
+        Screen {widget: None}
     }
 
     //pub fn set_widget<W: Widget>(&mut self, widget: W) {
@@ -132,7 +132,7 @@ impl<'a> Widget for Screen<'a> {
     fn draw(&mut self, pos: Pos, size: Size) {
         println!("draw screen");
         match self.widget {
-            Some(w) => println!("main widget"),
+            Some(ref w) => println!("main widget"),
             None => println!("no op")
         }
     }
