@@ -99,10 +99,10 @@ impl<'a> Screen<'a> {
         Screen {widget: None}
     }
 
-    //pub fn set_widget<W: Widget>(&mut self, widget: W) {
-    //    let owned = box widget;
-    //    self.widget = Some(owned);
-    //}
+    pub fn set_widget<W: Widget>(&mut self, widget: W) {
+        let owned = box widget;
+        self.widget = Some(owned);
+    }
 
     pub fn wait() {
         rustbox::present();
