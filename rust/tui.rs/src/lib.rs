@@ -11,6 +11,12 @@ pub struct Size {
     height: uint,
 }
 
+impl Size {
+    pub fn new(width: uint, height: uint) -> Size {
+        Size{width: width, height: height}
+    }
+}
+
 pub struct Pos {
     x: uint,
     y: uint,
@@ -21,7 +27,7 @@ pub trait Widget {
     /// set by the container
     fn set_size(&mut self, size: Size);
 
-    fn draw(&mut self, pos: Pos, size: Size);
+    fn draw(&self, pos: Pos, size: Size);
 }
 
 pub trait Container {
@@ -31,6 +37,12 @@ pub trait Container {
 pub struct Button {
     message: String,
     size: Size,
+}
+
+impl Button {
+    pub fn new(message: String, size: Size) -> Button {
+        Button{message: message, size: size}
+    }
 }
 
 impl Widget for Button {
@@ -43,8 +55,14 @@ impl Widget for Button {
         self.size = size;
     }
 
-    fn draw(&mut self, pos: Pos, size: Size) {
-        println!("draw button");
+    fn draw(&self, pos: Pos, size: Size) {
+        for x in range(pos.x, size.width) {
+            for y in range(pos.y, size.height) {
+                rustbox::change_cell(x, y, ' ' as u32, 
+                                     rustbox::convert_color(rustbox::White),
+                                     rustbox::convert_color(rustbox::White));
+            }
+        }
     }
 }
 
@@ -65,7 +83,7 @@ impl Widget for HLayout {
         self.size = size;
     }
 
-    fn draw(&mut self, pos: Pos, size: Size) {
+    fn draw(&self, pos: Pos, size: Size) {
         println!("draw hlayout");
     }
 
@@ -88,14 +106,6 @@ impl<'a> Screen<'a> {
         rustbox::init();
         rustbox::clear();
 
-        // paint the bw blue
-        for x in range(0, rustbox::width()) {
-            for y in range(0, rustbox::height()) {
-                rustbox::change_cell(x, y, ' ' as u32, 
-                                     rustbox::convert_color(rustbox::White),
-                                     rustbox::convert_color(rustbox::Blue));
-            }
-        }
         Screen {widget: None}
     }
 
@@ -104,7 +114,7 @@ impl<'a> Screen<'a> {
         self.widget = Some(owned);
     }
 
-    pub fn wait() {
+    pub fn wait(&self) {
         rustbox::present();
         loop {
             match rustbox::poll_event() {
@@ -118,21 +128,11 @@ impl<'a> Screen<'a> {
             }
         }
     }
-}
 
-impl<'a> Widget for Screen<'a> {
-    fn get_min_size(&self) -> Size {
-        Size{width: rustbox::width(), height: rustbox::height()}
-    }
-
-    fn set_size(&mut self, size: Size) {
-        // no nop
-    }
-
-    fn draw(&mut self, pos: Pos, size: Size) {
-        println!("draw screen");
+    pub fn draw(&self) {
         match self.widget {
-            Some(ref w) => println!("main widget"),
+            Some(ref w) => w.draw(Pos{x: 0, y: 0},
+                                  Size{width: rustbox::width(), height: rustbox::height()}),
             None => println!("no op")
         }
     }
