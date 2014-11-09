@@ -47,8 +47,8 @@ impl Button {
 
 impl Widget for Button {
     fn get_preferred_size(&self) -> Size {
-        // text + border
-        Size{width: self.message.len() + 2, height: 3}
+        // [ Text ]
+        Size{width: self.message.len() + 4, height: 1}
     }
 
     fn set_size(&mut self, size: Size) {
@@ -56,12 +56,29 @@ impl Widget for Button {
     }
 
     fn draw(&self, pos: Pos, size: Size) {
-        for x in range(pos.x, size.width) {
-            for y in range(pos.y, size.height) {
-                rustbox::change_cell(x, y, ' ' as u32, 
+        let pref = self.get_preferred_size();
+        if size.width >= pref.width && size.height >= pref.height {
+            let mut x = pos.x;
+            let y = pos.y;
+            rustbox::change_cell(x, y, '[' as u32,
+                                         rustbox::convert_color(rustbox::White),
+                                         rustbox::convert_color(rustbox::Blue));
+            rustbox::change_cell(x + 1, y, ' ' as u32,
+                                 rustbox::convert_color(rustbox::White),
+                                 rustbox::convert_color(rustbox::Blue));
+            x = x + 2;
+            for c in self.message.chars() {
+                rustbox::change_cell(x, y, c as u32,
                                      rustbox::convert_color(rustbox::White),
-                                     rustbox::convert_color(rustbox::White));
+                                     rustbox::convert_color(rustbox::Blue));
+                x = x + 1;
             }
+            rustbox::change_cell(x, y, ' ' as u32,
+                                 rustbox::convert_color(rustbox::White),
+                                 rustbox::convert_color(rustbox::Blue));
+            rustbox::change_cell(x + 1, y, ']' as u32,
+                                 rustbox::convert_color(rustbox::White),
+                                 rustbox::convert_color(rustbox::Blue));
         }
     }
 }
