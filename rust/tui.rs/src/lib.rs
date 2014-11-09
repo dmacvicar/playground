@@ -23,7 +23,7 @@ pub struct Pos {
 }
 
 pub trait Widget {
-    fn get_min_size(&self) -> Size;
+    fn get_preferred_size(&self) -> Size;
     /// set by the container
     fn set_size(&mut self, size: Size);
 
@@ -46,7 +46,7 @@ impl Button {
 }
 
 impl Widget for Button {
-    fn get_min_size(&self) -> Size {
+    fn get_preferred_size(&self) -> Size {
         // text + border
         Size{width: self.message.len() + 2, height: 3}
     }
@@ -72,7 +72,7 @@ pub struct HLayout {
 }
 
 impl Widget for HLayout {
-    fn get_min_size(&self) -> Size {
+    fn get_preferred_size(&self) -> Size {
         // horizontal is the sum of all
         // vertical is the biggest one
         // TODO
