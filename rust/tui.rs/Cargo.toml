@@ -4,8 +4,8 @@ name = "tui"
 version = "0.1.0"
 authors = [ "dmacvicar@gmail.com" ]
 
-[dependencies.rustbox]
-git = "https://github.com/gchp/rustbox.git"
+[dependencies.ncurses]
+git = "https://github.com/jeaye/ncurses-rs"
 
 [lib]
 name = "tui"

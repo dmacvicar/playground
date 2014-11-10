@@ -1,10 +1,13 @@
+#![feature(globs)]
 #![feature(unsafe_destructor)]
-extern crate rustbox;
+extern crate ncurses;
 extern crate core;
 use std::string::String;
 use std::char::from_u32;
 use std::vec::Vec;
 use std::mem;
+
+use ncurses::*;
 
 pub struct Size {
     width: uint,
@@ -60,25 +63,12 @@ impl Widget for Button {
         if size.width >= pref.width && size.height >= pref.height {
             let mut x = pos.x;
             let y = pos.y;
-            rustbox::change_cell(x, y, '[' as u32,
-                                         rustbox::convert_color(rustbox::White),
-                                         rustbox::convert_color(rustbox::Blue));
-            rustbox::change_cell(x + 1, y, ' ' as u32,
-                                 rustbox::convert_color(rustbox::White),
-                                 rustbox::convert_color(rustbox::Blue));
-            x = x + 2;
-            for c in self.message.chars() {
-                rustbox::change_cell(x, y, c as u32,
-                                     rustbox::convert_color(rustbox::White),
-                                     rustbox::convert_color(rustbox::Blue));
-                x = x + 1;
-            }
-            rustbox::change_cell(x, y, ' ' as u32,
-                                 rustbox::convert_color(rustbox::White),
-                                 rustbox::convert_color(rustbox::Blue));
-            rustbox::change_cell(x + 1, y, ']' as u32,
-                                 rustbox::convert_color(rustbox::White),
-                                 rustbox::convert_color(rustbox::Blue));
+            mv(y as i32, x as i32);
+            addstr("[ ");
+            x = x + 2; mv(y as i32, x as i32);
+            addstr(self.message.as_slice());
+            x = x + self.message.len();
+            addstr(" ]");
         }
     }
 }
@@ -120,8 +110,13 @@ pub struct Screen<'a> {
 impl<'a> Screen<'a> {
 
     pub fn new() -> Screen<'a> {
-        rustbox::init();
-        rustbox::clear();
+        initscr();
+        raw();
+        keypad(stdscr, true);
+        noecho();
+        start_color();
+        curs_set(CURSOR_INVISIBLE);
+        refresh();
 
         Screen {widget: None}
     }
@@ -132,24 +127,24 @@ impl<'a> Screen<'a> {
     }
 
     pub fn wait(&self) {
-        rustbox::present();
+        refresh();
+        let ch = getch();
         loop {
-            match rustbox::poll_event() {
-                rustbox::KeyEvent(_, _, ch) => {
-                    match std::char::from_u32(ch) {
-                        Some('q') => { break; },
-                        _ => {}
-                    }
-                },
+            match ch {
+                KEY_F1 => { break; },
                 _ => { }
             }
         }
     }
 
     pub fn draw(&self) {
+        // screen size
+        let mut max_x = 0;
+        let mut max_y = 0;
+        getmaxyx(stdscr, &mut max_y, &mut max_x);
         match self.widget {
             Some(ref w) => w.draw(Pos{x: 0, y: 0},
-                                  Size{width: rustbox::width(), height: rustbox::height()}),
+                                  Size{width: max_x as uint, height: max_y as uint}),
             None => println!("no op")
         }
     }
@@ -158,7 +153,7 @@ impl<'a> Screen<'a> {
 #[unsafe_destructor]
 impl<'a> Drop for Screen<'a> {
     fn drop(&mut self) {
-     rustbox::shutdown();
+     endwin();
   }
 }
 
