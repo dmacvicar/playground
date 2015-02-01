@@ -1,0 +1,5 @@
+[package]
+
+name = "piecechains"
+version = "0.0.1"
+authors = ["Duncan Mac-Vicar P. <dmacvicar@suse.de>"]
